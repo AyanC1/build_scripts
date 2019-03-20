@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Telegram
-export ROL=~/build_scripts/onememe.conf
+#export ROL=~/build_scripts/onememe.conf
 
 # Build related
 export DEVICENAME=enchilada
 export DEFCONFG=kronic_defconfig
 
 # Path defines
-export SAUCE=/home/anirudhgupta109/priv
-export COMPRESS=/home/anirudhgupta109/kernels/compress
-export OUTPUT=/home/anirudhgupta109/kernels
+export SAUCE=/home/ayan/kernel/priv
+export COMPRESS=/home/ayan/kernel/kernels/compress
+export OUTPUT=/home/ayan/kernel/kernels
 export USE_CCACHE=1
 
 # Date and time
@@ -33,12 +33,16 @@ export LOGFILE=log-$BUILDDATE-$BUILDTIME.txt
 git pull
 
 # Clang and GCC
-export CC="$(command -v ccache) /home/anirudhgupta109/clang/clang-r353983/bin/clang"
+export CC="$(command -v ccache) /home/ayan/kernel/clang/clang-r353983/bin/clang"
 export KBUILD_COMPILER_STRING="$(${CC} --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
-export CROSS_COMPILE=/home/anirudhgupta109/gcc/bin/aarch64-linux-android-
+export CROSS_COMPILE=/home/ayan/kernel/gcc/bin/aarch64-linux-android-
 export CLANG_TRIPLE=aarch64-linux-gnu-
 export ARCH=arm64
 export SUBARCH=arm64
+
+export TARGET_KERNEL_CLANG_COMPILE=true
+export TARGET_KERNEL_CLANG_VERSION=9.0.1
+
 
 # installclean
 #telegram-send --config $ROL --format html "Building Clean af"
@@ -46,12 +50,12 @@ rm -rf out/arch/arm64/boot/Image.gz-dtb
 #rm -rf out/
 
 # Activate venv
-source ~/tmp/venv/bin/activate
+#source ~/tmp/venv/bin/activate
 
 # Build
 make O=out $DEFCONFG && time make -j$(nproc --all) O=out | tee $LOGFILE
-EXITCODE=$?
-if [ $EXITCODE -ne 0 ]; then telegram-send --config $ROL --format html "Build failed! Check log file <code>$LOGFILE</code>"; telegram-send --config $ROL --file $LOGFILE; exit 1; fi
+#EXITCODE=$?
+#if [ $EXITCODE -ne 0 ]; then telegram-send --config $ROL --format html "Build failed! Check log file <code>$LOGFILE</code>"; telegram-send --config $ROL --file $LOGFILE; exit 1; fi
 
 # Move Image.gz-dtb to AGKernel Folder
 rm -rf $COMPRESS/Image.gz-dtb
@@ -60,10 +64,10 @@ cd $COMPRESS
 zip $ZIP -r *
 
 # Starting upload!
-telegram-send --config $ROL --file $ZIP.zip --timeout 480.0
-mv $ZIP.zip $OUTPUT/$ZIP.zip
-cd $OUTPUT
-git push
-cd $SAUCE
-telegram-send --config $ROL --file out/include/generated/compile.h
-sudo shutdown
+#telegram-send --config $ROL --file $ZIP.zip --timeout 480.0
+#mv $ZIP.zip $OUTPUT/$ZIP.zip
+#cd $OUTPUT
+#git push
+#cd $SAUCE
+#telegram-send --config $ROL --file out/include/generated/compile.h
+#sudo shutdown
